@@ -37,8 +37,6 @@ TaskManager/
 │ ├── routers.py # API роуты
 │ └── services.py # Бизнес-логика
 ├── data/ # Директория для SQLite базы данных
-├── specs/ # Спецификации (остатки от Gauge)
-├── step_impl/ # Реализация шагов (остатки от Gauge)
 ├── requirements.txt # Python зависимости
 ├── Dockerfile # Docker образ
 ├── docker-compose.yml # Docker Compose

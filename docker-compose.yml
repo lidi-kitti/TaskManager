@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  taskmanager:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONPATH=/app
+    volumes:
+      - ./app:/app/app
+      - ./data:/app/data
+    restart: unless-stopped

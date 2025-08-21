@@ -32,21 +32,6 @@ def check_package(package_name, import_name=None):
         print(f"{package_name} не установлен")
         return False
 
-def check_gauge():
-    """Проверка установки Gauge"""
-    try:
-        result = subprocess.run(["gauge", "--version"], 
-                              capture_output=True, text=True)
-        if result.returncode == 0:
-            print("Gauge установлен")
-            return True
-        else:
-            print("Gauge не установлен")
-            return False
-    except FileNotFoundError:
-        print("Gauge не установлен")
-        return False
-
 def check_docker():
     """Проверка установки Docker"""
     try:
@@ -91,11 +76,7 @@ def main():
             all_good = False
     
     print("\nПроверка инструментов:")
-    
-    # Проверка Gauge
-    gauge_installed = check_gauge()
-    if not gauge_installed:
-        all_good = False
+
     
     # Проверка Docker
     docker_installed = check_docker()
@@ -110,17 +91,10 @@ def main():
         print("   python run_app.py")
         print("\nДля тестирования выполните:")
         print("   python test_api.py")
-        if gauge_installed:
-            print("   gauge run specs/")
     else:
         print("Некоторые зависимости не установлены")
         print("\nУстановите недостающие зависимости:")
         print("   pip install -r requirements.txt")
-        if not gauge_installed:
-            print("\nУстановите Gauge:")
-            print("   Windows: choco install gauge")
-            print("   macOS: brew install gauge")
-            print("   Linux: curl -SsL https://downloads.gauge.org/stable | sh")
 
 if __name__ == "__main__":
     main()

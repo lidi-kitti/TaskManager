@@ -98,7 +98,7 @@ python app/scripts/run_tests.py
    pip install -r requirements.txt
    ```
 
-4. **Запуск приложения:**
+4. **Запуск backend приложения:**
    ```bash
    # Вариант 1: Через uvicorn
    python -m uvicorn app.backend.main:app --reload --host 0.0.0.0 --port 8000
@@ -106,6 +106,17 @@ python app/scripts/run_tests.py
    # Вариант 2: Через скрипт
    python app/scripts/run_app.py
    ```
+
+5. **Установка и запуск frontend:**
+   ```bash
+   cd app/frontend
+   npm install
+   npm run dev
+   ```
+   
+   Frontend будет доступен по адресу: http://localhost:3000
+   
+   **Важно:** Убедитесь, что backend запущен на http://localhost:8000 перед запуском frontend
 
 ### Запуск через Docker
 

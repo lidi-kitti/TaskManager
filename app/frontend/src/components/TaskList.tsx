@@ -1,15 +1,19 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import type { Task, TaskStatus } from '../types/task';
+import type { Task, TaskStatus, SortBy, SortOrder } from '../types/task';
 import { taskApi } from '../api/client';
 import { TaskCard } from './TaskCard';
 import { TaskForm } from './TaskForm';
 import { FilterBar } from './FilterBar';
+import { Statistics } from './Statistics';
 import { TaskStatus as TaskStatusEnum } from '../types/task';
 
 export const TaskList: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [allTasks, setAllTasks] = useState<Task[]>([]);
   const [filter, setFilter] = useState<TaskStatus | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState<SortBy>(null);
+  const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -17,7 +21,12 @@ export const TaskList: React.FC = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const data = await taskApi.getTasks(filter || undefined);
+      const data = await taskApi.getTasks(
+        filter || undefined,
+        searchQuery || undefined,
+        sortBy || undefined,
+        sortBy ? sortOrder : undefined
+      );
       setTasks(data);
       
       // Загружаем все задачи для счетчиков
@@ -29,11 +38,24 @@ export const TaskList: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [filter]);
+  }, [filter, searchQuery, sortBy, sortOrder]);
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      loadTasks();
+    }, searchQuery ? 300 : 0); // Debounce для поиска
+
+    return () => clearTimeout(timeoutId);
+  }, [loadTasks, searchQuery]);
 
   useEffect(() => {
     loadTasks();
-  }, [loadTasks]);
+  }, [filter, sortBy, sortOrder]);
+
+  const handleSortChange = (newSortBy: SortBy, newSortOrder: SortOrder) => {
+    setSortBy(newSortBy);
+    setSortOrder(newSortOrder);
+  };
 
   const taskCounts = {
     all: allTasks.length,
@@ -44,11 +66,18 @@ export const TaskList: React.FC = () => {
 
   return (
     <div>
+      <Statistics />
+
       <TaskForm onSuccess={loadTasks} />
 
       <FilterBar
         currentFilter={filter}
         onFilterChange={setFilter}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        sortBy={sortBy}
+        sortOrder={sortOrder}
+        onSortChange={handleSortChange}
         taskCounts={taskCounts}
       />
 
@@ -67,7 +96,9 @@ export const TaskList: React.FC = () => {
       {!isLoading && !error && tasks.length === 0 && (
         <div className="bg-white rounded-lg shadow-md p-8 text-center">
           <p className="text-gray-500 text-lg">
-            {filter ? 'Нет задач с выбранным фильтром' : 'Нет задач. Создайте первую задачу!'}
+            {searchQuery || filter
+              ? 'Нет задач, соответствующих критериям поиска'
+              : 'Нет задач. Создайте первую задачу!'}
           </p>
         </div>
       )}

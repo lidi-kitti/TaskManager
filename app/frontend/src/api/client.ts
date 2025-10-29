@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { Task, TaskCreate, TaskUpdate, TaskStatus } from '../types/task';
+import type { Task, TaskCreate, TaskUpdate, TaskStatus, TaskStatistics, SortBy, SortOrder } from '../types/task';
 
 const API_BASE_URL = 'http://localhost:8000/api/v1';
 
@@ -12,9 +12,19 @@ const apiClient = axios.create({
 
 export const taskApi = {
   // Получить все задачи
-  getTasks: async (status?: TaskStatus): Promise<Task[]> => {
+  getTasks: async (
+    status?: TaskStatus,
+    search?: string,
+    sortBy?: SortBy,
+    sortOrder?: SortOrder
+  ): Promise<Task[]> => {
     const response = await apiClient.get<Task[]>('/tasks/', {
-      params: status ? { status } : undefined,
+      params: {
+        ...(status && { status }),
+        ...(search && { search }),
+        ...(sortBy && { sort_by: sortBy }),
+        ...(sortOrder && { sort_order: sortOrder }),
+      },
     });
     return response.data;
   },
@@ -40,6 +50,12 @@ export const taskApi = {
   // Удалить задачу
   deleteTask: async (id: string): Promise<void> => {
     await apiClient.delete(`/tasks/${id}`);
+  },
+
+  // Получить статистику
+  getStatistics: async (): Promise<TaskStatistics> => {
+    const response = await apiClient.get<TaskStatistics>('/tasks/statistics/summary');
+    return response.data;
   },
 };
 

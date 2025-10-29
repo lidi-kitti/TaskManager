@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Query, Depends
 from typing import List, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.backend.models import Task, TaskCreate, TaskUpdate, TaskStatus
+from app.backend.models import Task, TaskCreate, TaskUpdate, TaskStatus, TaskStatistics
 from app.backend.services import task_service
 from app.backend.database import get_db
 
@@ -26,10 +26,13 @@ async def get_task(task_id: str, db: AsyncSession = Depends(get_db)):
 @router.get("/", response_model=List[Task])
 async def get_tasks(
     status: Optional[TaskStatus] = Query(None, description="Фильтр по статусу"),
+    search: Optional[str] = Query(None, description="Поиск по названию и описанию"),
+    sort_by: Optional[str] = Query(None, description="Сортировка: created_at, updated_at, status, priority, deadline"),
+    sort_order: Optional[str] = Query("asc", description="Порядок сортировки: asc или desc"),
     db: AsyncSession = Depends(get_db)
 ):
     """Получение списка задач"""
-    return await task_service.get_tasks(db, status)
+    return await task_service.get_tasks(db, status, search, sort_by, sort_order)
 
 
 @router.put("/{task_id}", response_model=Task)
@@ -47,3 +50,8 @@ async def delete_task(task_id: str, db: AsyncSession = Depends(get_db)):
     if not await task_service.delete_task(db, task_id):
         raise HTTPException(status_code=404, detail="Задача не найдена")
     return None
+
+@router.get("/statistics/summary", response_model=TaskStatistics)
+async def get_statistics(db: AsyncSession = Depends(get_db)):
+    """Получение статистики задач"""
+    return await task_service.get_statistics(db)

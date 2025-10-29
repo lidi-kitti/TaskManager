@@ -30,6 +30,13 @@ class TaskStatusEnum(enum.Enum):
     IN_PROGRESS = "в работе"
     COMPLETED = "завершено"
 
+class PriorityEnum(enum.Enum):
+    """Enum для приоритетов задач в БД"""
+    LOW = "низкий"
+    MEDIUM = "средний"
+    HIGH = "высокий"
+
+
 
 class TaskDB(Base):
     """SQLAlchemy модель для задач"""
@@ -39,6 +46,8 @@ class TaskDB(Base):
     title = Column(String(200), nullable=False)
     description = Column(String(1000), nullable=True)
     status = Column(SQLEnum(TaskStatusEnum), nullable=False, default=TaskStatusEnum.CREATED)
+    priority = Column(SQLEnum(PriorityEnum), nullable=False, default=PriorityEnum.MEDIUM)
+    deadline = Column(DateTime, nullable=True)
     created_at = Column(DateTime, nullable=False, default=lambda: datetime.now(timezone.utc))
     updated_at = Column(DateTime, nullable=False, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 

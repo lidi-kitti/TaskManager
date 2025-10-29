@@ -7,8 +7,9 @@ import uvicorn
 import sys
 import os
 
-# Добавляем текущую директорию в путь для импорта
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+# Добавляем корневую директорию проекта в путь для импорта
+project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, project_root)
 
 if __name__ == "__main__":
     print("Запуск TaskManager API...")
@@ -18,7 +19,7 @@ if __name__ == "__main__":
     print("=" * 50)
     
     uvicorn.run(
-        "app.main:app",
+        "app.backend.main:app",
         host="0.0.0.0",
         port=8000,
         reload=True,

@@ -5,9 +5,15 @@
 
 import asyncio
 import sys
-from app.database import init_db, AsyncSessionLocal
-from app.services import task_service
-from app.models import TaskCreate, TaskStatus
+import os
+
+# Добавляем корневую директорию проекта в путь для импорта
+project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, project_root)
+
+from app.backend.database import init_db, AsyncSessionLocal
+from app.backend.services import task_service
+from app.backend.models import TaskCreate, TaskStatus
 
 
 async def create_test_data():
@@ -86,7 +92,7 @@ async def main():
         await show_statistics()
         
         print("\nТестовые данные успешно созданы!")
-        print("Теперь можно запустить приложение: python run_app.py")
+        print("Теперь можно запустить приложение: python app/scripts/run_app.py")
         
     except Exception as e:
         print(f"\nОшибка: {e}")

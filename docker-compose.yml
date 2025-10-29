@@ -9,5 +9,5 @@ services:
       - PYTHONPATH=/app
     volumes:
       - ./app:/app/app
-      - ./data:/app/data
+      - ./backend/data:/app/data
     restart: unless-stopped

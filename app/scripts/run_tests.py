@@ -5,6 +5,7 @@
 
 import subprocess
 import sys
+import os
 import time
 import requests
 from pathlib import Path
@@ -41,9 +42,10 @@ def start_api_if_needed():
         print("API не запущен. Запускаем...")
         try:
             # Запускаем API в фоновом режиме
+            script_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "run_app.py")
             process = subprocess.Popen([
-                sys.executable, "run_app.py"
-            ], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                sys.executable, script_path
+            ], stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=os.path.dirname(script_path))
             
             # Ждем запуска API
             for i in range(30):  # Максимум 30 секунд
@@ -70,12 +72,14 @@ def run_regular_tests():
     print("Запуск обычных тестов...")
     
     try:
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        test_file = os.path.join(script_dir, "test_api.py")
         result = subprocess.run([
             sys.executable, "-m", "pytest", 
-            "test_api.py", 
+            test_file, 
             "-v",
             "--tb=short"
-        ], capture_output=True, text=True)
+        ], capture_output=True, text=True, cwd=script_dir)
         
         print("Результаты обычных тестов:")
         print(result.stdout)

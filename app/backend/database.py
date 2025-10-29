@@ -7,7 +7,14 @@ from datetime import datetime, timezone
 import uuid
 
 # Асинхронная база данных
-DATABASE_URL = "sqlite+aiosqlite:///./taskmanager.db"
+import os
+from pathlib import Path
+
+# Определяем корневую директорию проекта (на 3 уровня выше от app/backend/database.py)
+_project_root = Path(__file__).resolve().parent.parent.parent
+_db_path = _project_root / "taskmanager.db"
+# Используем абсолютный путь для базы данных
+DATABASE_URL = f"sqlite+aiosqlite:///{_db_path}"
 
 engine = create_async_engine(DATABASE_URL, echo=True)
 AsyncSessionLocal = sessionmaker(

@@ -88,9 +88,9 @@ def main():
     if all_good:
         print("Все основные зависимости установлены!")
         print("\nДля запуска приложения выполните:")
-        print("   python run_app.py")
+        print("   python app/scripts/run_app.py")
         print("\nДля тестирования выполните:")
-        print("   python test_api.py")
+        print("   python app/scripts/test_api.py")
     else:
         print("Некоторые зависимости не установлены")
         print("\nУстановите недостающие зависимости:")

@@ -2,8 +2,8 @@ from typing import List, Optional
 from datetime import datetime, timezone
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, update, delete
-from app.models import Task, TaskCreate, TaskUpdate, TaskStatus
-from app.database import TaskDB, TaskStatusEnum
+from app.backend.models import Task, TaskCreate, TaskUpdate, TaskStatus
+from app.backend.database import TaskDB, TaskStatusEnum
 
 
 class TaskService:

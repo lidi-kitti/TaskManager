@@ -29,23 +29,25 @@
 
 ```
 TaskManager/
-├── app/ # Основной код приложения
-│ ├── init.py
-│ ├── main.py # Точка входа FastAPI
-│ ├── models.py # Pydantic модели
-│ ├── database.py # SQLAlchemy модели и конфигурация БД
-│ ├── routers.py # API роуты
-│ └── services.py # Бизнес-логика
-├── data/ # Директория для SQLite базы данных
+├── app/
+│   ├── backend/ # Backend код приложения
+│   │   ├── __init__.py
+│   │   ├── main.py # Точка входа FastAPI
+│   │   ├── models.py # Pydantic модели
+│   │   ├── database.py # SQLAlchemy модели и конфигурация БД
+│   │   ├── routers.py # API роуты
+│   │   └── services.py # Бизнес-логика
+│   ├── frontend/ # Frontend код приложения (пока пусто)
+│   └── scripts/ # Скрипты для работы с приложением
+│       ├── run_app.py # Скрипт запуска приложения
+│       ├── run_tests.py # Скрипт запуска тестов
+│       ├── test_api.py # Тесты API
+│       ├── create_test_data.py # Скрипт создания тестовых данных
+│       └── check_requirements.py # Скрипт проверки зависимостей
 ├── requirements.txt # Python зависимости
 ├── Dockerfile # Docker образ
 ├── docker-compose.yml # Docker Compose
 ├── manifest.json # Манифест приложения
-├── run_app.py # Скрипт запуска приложения
-├── run_tests.py # Скрипт запуска тестов
-├── test_api.py # Тесты API
-├── create_test_data.py # Скрипт создания тестовых данных
-├── check_requirements.py # Скрипт проверки зависимостей
 ├── taskmanager.db # SQLite база данных
 └── README.md # Документация
 ```
@@ -61,10 +63,10 @@ cd TaskManager
 pip install -r requirements.txt
 
 # 3. Запуск приложения
-python run_app.py
+python app/scripts/run_app.py
 
 # 4. В новом терминале - запуск тестов
-python run_tests.py
+python app/scripts/run_tests.py
 ```
 
 ## Установка и запуск
@@ -99,10 +101,10 @@ python run_tests.py
 4. **Запуск приложения:**
    ```bash
    # Вариант 1: Через uvicorn
-   python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+   python -m uvicorn app.backend.main:app --reload --host 0.0.0.0 --port 8000
    
    # Вариант 2: Через скрипт
-   python run_app.py
+   python app/scripts/run_app.py
    ```
 
 ### Запуск через Docker
@@ -182,12 +184,12 @@ pip install pytest httpx
 
 **Автоматический запуск всех тестов:**
    ```bash
-   python run_tests.py
+   python app/scripts/run_tests.py
    ```
 
 **Запуск только обычных тестов:**
    ```bash
-   python -m pytest test_api.py -v
+   python -m pytest app/scripts/test_api.py -v
    ```
 
 ### Структура тестов
@@ -199,10 +201,10 @@ pip install pytest httpx
 
 ### Добавление новых эндпоинтов
 
-1. Создайте модель в `app/models.py`
-2. Добавьте бизнес-логику в `app/services.py`
-3. Создайте роут в `app/routers.py`
-4. Добавьте тесты в `test_api.py`
+1. Создайте модель в `app/backend/models.py`
+2. Добавьте бизнес-логику в `app/backend/services.py`
+3. Создайте роут в `app/backend/routers.py`
+4. Добавьте тесты в `app/scripts/test_api.py`
 
 ### Структура кода
 

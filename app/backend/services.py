@@ -1,9 +1,10 @@
 from typing import List, Optional
 from datetime import datetime, timezone, date
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, update, delete
+from sqlalchemy import select, update, delete, or_, and_
 from app.backend.models import Task, TaskCreate, TaskUpdate, TaskStatus, Priority, TaskStatistics
 from app.backend.database import TaskDB, TaskStatusEnum, PriorityEnum
+from app.backend.auth import CurrentUser
 
 
 class TaskService:
@@ -63,9 +64,10 @@ class TaskService:
             updated_at=db_task.updated_at
         )
     
-    async def create_task(self, db: AsyncSession, task_data: TaskCreate) -> Task:
+    async def create_task(self, db: AsyncSession, task_data: TaskCreate, current_user: CurrentUser) -> Task:
         """Создание новой задачи"""
         db_task = TaskDB(
+            user_id=current_user.id,
             title=task_data.title,
             description=task_data.description,
             status=self._status_to_enum(task_data.status),
@@ -79,12 +81,15 @@ class TaskService:
         
         return self._db_to_pydantic(db_task)
     
-    async def get_task(self, db: AsyncSession, task_id: str) -> Optional[Task]:
+    async def get_task(self, db: AsyncSession, task_id: str, current_user: CurrentUser) -> Optional[Task]:
         """Получение задачи по ID"""
         result = await db.execute(select(TaskDB).where(TaskDB.id == task_id))
         db_task = result.scalar_one_or_none()
         
         if db_task is None:
+            return None
+        # Проверка доступа: админ или владелец
+        if current_user.role.value != "admin" and db_task.user_id != current_user.id:
             return None
             
         return self._db_to_pydantic(db_task)
@@ -95,9 +100,13 @@ class TaskService:
         status: Optional[TaskStatus] = None,
         search: Optional[str] = None,
         sort_by: Optional[str] = None,
-        sort_order: Optional[str] = "asc") -> List[Task]:
+        sort_order: Optional[str] = "asc",
+        current_user: Optional[CurrentUser] = None) -> List[Task]:
         """Получение списка задач с возможной фильтрацией по статусу"""
         query = select(TaskDB)
+        # Ограничение по пользователю (не админ видит только свои)
+        if current_user is not None and current_user.role.value != "admin":
+            query = query.where(TaskDB.user_id == current_user.id)
         
         if status is not None:
             enum_status = self._status_to_enum(status)
@@ -149,12 +158,15 @@ class TaskService:
         
         return [self._db_to_pydantic(db_task) for db_task in db_tasks]
     
-    async def update_task(self, db: AsyncSession, task_id: str, task_data: TaskUpdate) -> Optional[Task]:
+    async def update_task(self, db: AsyncSession, task_id: str, task_data: TaskUpdate, current_user: CurrentUser) -> Optional[Task]:
         """Обновление задачи"""
         result = await db.execute(select(TaskDB).where(TaskDB.id == task_id))
         db_task = result.scalar_one_or_none()
         
         if db_task is None:
+            return None
+        # Проверка доступа
+        if current_user.role.value != "admin" and db_task.user_id != current_user.id:
             return None
         
         update_data = task_data.dict(exclude_unset=True)
@@ -178,13 +190,16 @@ class TaskService:
         
         return self._db_to_pydantic(updated_task)
     
-    async def delete_task(self, db: AsyncSession, task_id: str) -> bool:
+    async def delete_task(self, db: AsyncSession, task_id: str, current_user: CurrentUser) -> bool:
         """Удаление задачи"""
         # Проверяем существование задачи
         result = await db.execute(select(TaskDB).where(TaskDB.id == task_id))
         db_task = result.scalar_one_or_none()
         
         if db_task is None:
+            return False
+        # Проверка доступа
+        if current_user.role.value != "admin" and db_task.user_id != current_user.id:
             return False
         
         # Удаляем задачу

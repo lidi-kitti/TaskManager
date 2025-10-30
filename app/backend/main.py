@@ -1,8 +1,14 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
+from dotenv import load_dotenv
+
+# Загружаем переменные окружения из .env до импорта модулей, которые их читают
+load_dotenv()
+
 from app.backend.routers import router
-from app.backend.database import init_db
+from app.backend.database import init_db, AsyncSessionLocal
+from app.backend.auth import auth_router, ensure_admin
 
 
 @asynccontextmanager
@@ -10,6 +16,9 @@ async def lifespan(app: FastAPI):
     """Lifespan events для инициализации и завершения приложения"""
     # Startup
     await init_db()
+    # Создание дефолтного администратора (dev)
+    async with AsyncSessionLocal() as session:
+        await ensure_admin(session)
     print("База данных инициализирована")
     yield
     # Shutdown
@@ -36,6 +45,7 @@ app.add_middleware(
 
 # Подключение роутов
 app.include_router(router)
+app.include_router(auth_router)
 
 @app.get("/")
 async def root():

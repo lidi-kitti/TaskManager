@@ -1,5 +1,6 @@
 import React from 'react';
 import { TaskList } from './components/TaskList';
+import { Auth } from './components/Auth';
 import './App.css';
 
 function App() {
@@ -13,7 +14,11 @@ function App() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <TaskList />
+        {localStorage.getItem('tm_access_token') ? (
+          <TaskList />
+        ) : (
+          <Auth />
+        )}
       </main>
 
       <footer className="bg-white border-t mt-12">

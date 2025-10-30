@@ -11,13 +11,12 @@ import os
 project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, project_root)
 
-if __name__ == "__main__":
+def main() -> None:
     print("Запуск TaskManager API...")
     print("Документация: http://localhost:8000/docs")
     print("ReDoc: http://localhost:8000/redoc")
     print("Проверка состояния: http://localhost:8000/health")
     print("=" * 50)
-    
     uvicorn.run(
         "app.backend.main:app",
         host="0.0.0.0",
@@ -25,3 +24,7 @@ if __name__ == "__main__":
         reload=True,
         log_level="info"
     )
+
+
+if __name__ == "__main__":
+    main()

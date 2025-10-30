@@ -10,6 +10,16 @@ const apiClient = axios.create({
   },
 });
 
+// Добавляем токен, если он сохранён
+apiClient.interceptors.request.use((config) => {
+  const token = localStorage.getItem('tm_access_token');
+  if (token) {
+    config.headers = config.headers || {};
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
 export const taskApi = {
   // Получить все задачи
   getTasks: async (
@@ -56,6 +66,36 @@ export const taskApi = {
   getStatistics: async (): Promise<TaskStatistics> => {
     const response = await apiClient.get<TaskStatistics>('/tasks/statistics/summary');
     return response.data;
+  },
+};
+
+export const authApi = {
+  login: async (username: string, password: string): Promise<string> => {
+    const params = new URLSearchParams();
+    params.append('username', username);
+    params.append('password', password);
+    const response = await axios.post<{ access_token: string }>(`${API_BASE_URL}/auth/login`, params, {
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    });
+    const token = response.data.access_token;
+    localStorage.setItem('tm_access_token', token);
+    return token;
+  },
+  yandexConfig: async (): Promise<{ client_id: string; redirect_uri: string; authorize_url: string }> => {
+    const resp = await axios.get(`${API_BASE_URL}/auth/yandex/config`);
+    return resp.data;
+  },
+  yandexExchangeCode: async (code: string): Promise<string> => {
+    const resp = await axios.post<{ access_token: string }>(`${API_BASE_URL}/auth/yandex/callback`, null, { params: { code } });
+    const token = resp.data.access_token;
+    localStorage.setItem('tm_access_token', token);
+    return token;
+  },
+  register: async (username: string, password: string): Promise<void> => {
+    await axios.post(`${API_BASE_URL}/auth/register`, { username, password });
+  },
+  logout: (): void => {
+    localStorage.removeItem('tm_access_token');
   },
 };
 

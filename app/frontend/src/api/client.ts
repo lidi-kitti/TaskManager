@@ -69,6 +69,23 @@ export const taskApi = {
   },
 };
 
+// Вспомогательная функция для декодирования JWT токена
+function decodeJWT(token: string): { username?: string } | null {
+  try {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    );
+    return JSON.parse(jsonPayload);
+  } catch {
+    return null;
+  }
+}
+
 export const authApi = {
   login: async (username: string, password: string): Promise<string> => {
     const params = new URLSearchParams();
@@ -79,6 +96,8 @@ export const authApi = {
     });
     const token = response.data.access_token;
     localStorage.setItem('tm_access_token', token);
+    // Сохраняем username в localStorage
+    localStorage.setItem('tm_username', username);
     return token;
   },
   yandexConfig: async (): Promise<{ client_id: string; redirect_uri: string; authorize_url: string }> => {
@@ -89,6 +108,11 @@ export const authApi = {
     const resp = await axios.post<{ access_token: string }>(`${API_BASE_URL}/auth/yandex/callback`, null, { params: { code } });
     const token = resp.data.access_token;
     localStorage.setItem('tm_access_token', token);
+    // Получаем username из JWT токена
+    const decoded = decodeJWT(token);
+    if (decoded?.username) {
+      localStorage.setItem('tm_username', decoded.username);
+    }
     return token;
   },
   register: async (username: string, password: string): Promise<void> => {
@@ -96,6 +120,7 @@ export const authApi = {
   },
   logout: (): void => {
     localStorage.removeItem('tm_access_token');
+    localStorage.removeItem('tm_username');
   },
 };
 

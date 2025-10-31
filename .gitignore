@@ -15,10 +15,21 @@ taskmanager.db
 ./app/frontend/*.sln/
 ./app/frontend/*.sw?/
 ./app/backend/_pycache/
-
+./app/scripts/_pycache_
 ./uv.lock
+./idea
+
 
 ./taskmanager.egg-info
 
 ./app/backend/__pycache__
 
+.idea/.gitignore
+.idea/misc.xml
+.idea/modules.xml
+.idea/TaskManager.iml
+.idea/vcs.xml
+.idea/inspectionProfiles/profiles_settings.xml
+.idea/inspectionProfiles/Project_Default.xml
+app/scripts/__pycache__/run_frontend.cpython-312.pyc
+app/scripts/__pycache__/run_frontend.cpython-312.pyc

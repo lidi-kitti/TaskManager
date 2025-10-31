@@ -23,7 +23,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("TM_ACCESS_EXPIRE_MIN", "1440"))
 # Яндекс OAuth
 YA_CLIENT_ID = os.getenv("TM_YA_CLIENT_ID", "")
 YA_CLIENT_SECRET = os.getenv("TM_YA_CLIENT_SECRET", "")
-YA_REDIRECT_URI = os.getenv("TM_YA_REDIRECT_URI", "http://localhost:5173/")
+YA_REDIRECT_URI = os.getenv("TM_YA_REDIRECT_URI", "http://localhost:5173").strip()
 YA_AUTHORIZE_URL = "https://oauth.yandex.ru/authorize"
 YA_TOKEN_URL = "https://oauth.yandex.ru/token"
 YA_USERINFO_URL = "https://login.yandex.ru/info"

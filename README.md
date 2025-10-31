@@ -133,7 +133,7 @@ TM_DATABASE_URL=
 # Яндекс OAuth (опционально)
 TM_YA_CLIENT_ID=your-yandex-client-id
 TM_YA_CLIENT_SECRET=your-yandex-client-secret
-TM_YA_REDIRECT_URI=http://localhost:5173/
+TM_YA_REDIRECT_URI=http://localhost:5173
 ```
 
 ### Шаг 3: Установка зависимостей и запуск
@@ -376,12 +376,12 @@ docker run -p 8000:8000 --env-file .env taskmanager
 1. Перейдите на [Яндекс ID для разработчиков](https://yandex.ru/dev/id/)
 2. Зарегистрируйте новое приложение
 3. Получите `client_id` и `client_secret`
-4. Настройте redirect URI: `http://localhost:5173/` (для разработки)
+4. Настройте redirect URI: `http://localhost:5173` (для разработки) - ВАЖНО: значение должно точно совпадать с тем, что вы укажете в `.env`
 5. Добавьте значения в `.env`:
    ```env
    TM_YA_CLIENT_ID=ваш_client_id
    TM_YA_CLIENT_SECRET=ваш_client_secret
-   TM_YA_REDIRECT_URI=http://localhost:5173/
+   TM_YA_REDIRECT_URI=http://localhost:5173
    ```
 
 ## 📊 Мониторинг и доступ

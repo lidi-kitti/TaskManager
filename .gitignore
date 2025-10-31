@@ -33,3 +33,4 @@ taskmanager.db
 .idea/inspectionProfiles/Project_Default.xml
 app/scripts/__pycache__/run_frontend.cpython-312.pyc
 app/scripts/__pycache__/run_frontend.cpython-312.pyc
+app/backend/__pycache__/auth.cpython-312.pyc

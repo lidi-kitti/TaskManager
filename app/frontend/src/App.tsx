@@ -1,18 +1,54 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { TaskList } from './components/TaskList';
 import { Auth } from './components/Auth';
+import { OAuthCallback } from './components/OAuthCallback';
 import { authApi } from './api/client';
 import './App.css';
 
 function App() {
-  const isAuthenticated = !!localStorage.getItem('tm_access_token');
-  const username = localStorage.getItem('tm_username') || 'Пользователь';
+  const [isAuthenticated, setIsAuthenticated] = useState(() => !!localStorage.getItem('tm_access_token'));
+  const [username, setUsername] = useState(() => localStorage.getItem('tm_username') || 'Пользователь');
+  
+  // Проверяем, есть ли параметр code в URL (OAuth callback)
+  const url = new URL(window.location.href);
+  const oauthCode = url.searchParams.get('code');
+
+  // Проверяем аутентификацию при монтировании компонента
+  useEffect(() => {
+    const checkAuth = () => {
+      const token = localStorage.getItem('tm_access_token');
+      const user = localStorage.getItem('tm_username') || 'Пользователь';
+      setIsAuthenticated(!!token);
+      setUsername(user);
+    };
+
+    // Проверяем сразу при монтировании
+    checkAuth();
+
+    // Слушаем события storage для синхронизации между вкладками
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'tm_access_token' || e.key === 'tm_username') {
+        checkAuth();
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
 
   const handleLogout = () => {
     authApi.logout();
     localStorage.removeItem('tm_username');
     window.location.reload();
   };
+
+  // Если это OAuth callback, показываем компонент обработки callback
+  if (oauthCode) {
+    return <OAuthCallback />;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">

@@ -12,6 +12,11 @@ project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(_
 sys.path.insert(0, project_root)
 
 def main() -> None:
+    # Устанавливаем UTF-8 для Windows
+    if sys.platform == "win32":
+        sys.stdout.reconfigure(encoding='utf-8')
+        sys.stderr.reconfigure(encoding='utf-8')
+    
     print("Запуск TaskManager API...")
     print("Документация: http://localhost:8000/docs")
     print("ReDoc: http://localhost:8000/redoc")

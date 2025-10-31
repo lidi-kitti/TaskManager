@@ -86,28 +86,16 @@ async def get_db():
 async def init_db():
     """Инициализация базы данных"""
     async with engine.begin() as conn:
+        # Создаём все таблицы через metadata (idempotent - не пересоздаёт существующие)
         await conn.run_sync(Base.metadata.create_all)
-        from sqlalchemy import inspect, text
-        inspector = inspect(conn.sync_connection)
-
-        tables = inspector.get_table_names()
-        if "users" not in tables:
-            await conn.execute(text(
-                """
-                CREATE TABLE IF NOT EXISTS users (
-                    id VARCHAR PRIMARY KEY,
-                    username VARCHAR(150) UNIQUE NOT NULL,
-                    hashed_password VARCHAR(255) NOT NULL,
-                    role VARCHAR NOT NULL
-                )
-                """
-            ))
-
-        # Добавить user_id в tasks, если отсутствует
-        columns = [c["name"] for c in inspector.get_columns("tasks")] if "tasks" in tables else []
-        if "tasks" in tables and "user_id" not in columns:
-            # Добавляем nullable колонку, затем выставим значения и оставим nullable для совместимости
-            try:
-                await conn.execute(text("ALTER TABLE tasks ADD COLUMN user_id VARCHAR"))
-            except Exception:
-                pass
+        
+        # Попытка миграции для существующих БД без user_id в tasks
+        # Используем прямой SQL запрос, чтобы проверить существование колонки
+        from sqlalchemy import text
+        try:
+            # Пытаемся добавить user_id, если его нет (SQLite не поддерживает IF NOT EXISTS для ALTER)
+            # Если колонка уже есть, получим ошибку, которую игнорируем
+            await conn.execute(text("ALTER TABLE tasks ADD COLUMN user_id VARCHAR"))
+        except Exception:
+            # Колонка уже существует или таблицы tasks нет - это нормально
+            pass

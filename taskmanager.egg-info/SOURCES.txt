@@ -11,6 +11,7 @@ app/backend/services.py
 app/scripts/check_requirements.py
 app/scripts/create_test_data.py
 app/scripts/run_app.py
+app/scripts/run_frontend.py
 app/scripts/run_tests.py
 app/scripts/test_api.py
 taskmanager.egg-info/PKG-INFO

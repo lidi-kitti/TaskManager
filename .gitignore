@@ -1,5 +1,24 @@
 .env
-./venv/
+./venv
 taskmanager.db
+./scripts/_pycache
+./app/frontend/node_modules
+./app/frontend/dist/
+./app/frontend/dist-ssr/
+./app/frontend/*.local
+./app/frontend/.vscode/
+./app/frontend/.idea/
+./app/frontend/.DS_Store/
+./app/frontend/*.suo/
+./app/frontend/*.ntvs/
+./app/frontend/*.njsproj/
+./app/frontend/*.sln/
+./app/frontend/*.sw?/
+./app/backend/_pycache/
 
+uv.lock
+taskmanager.egg-info
 
+app/backend/__pycache__
+app/backend/__pycache__/auth.cpython-312.pyc
+app/backend/__pycache__/database.cpython-312.pyc

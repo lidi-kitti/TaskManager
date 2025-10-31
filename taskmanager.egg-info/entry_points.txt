@@ -1,2 +1,3 @@
 [console_scripts]
 taskmanager = app.scripts.run_app:main
+taskmanager-frontend = app.scripts.run_frontend:main

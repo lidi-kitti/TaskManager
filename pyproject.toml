@@ -8,8 +8,8 @@ version = "0.1.0"
 description = "TaskManager API with auth"
 requires-python = ">=3.11"
 dependencies = [
-  "fastapi==0.104.1",
-  "starlette>=0.27,<0.38",
+  "fastapi>=0.115.0",
+  "starlette>=0.37.0",
   "uvicorn==0.24.0",
   "pydantic>=2.3,<3",
   "pydantic[email]",
@@ -19,13 +19,14 @@ dependencies = [
   "sqlalchemy==2.0.23",
   "aiosqlite==0.19.0",
   "requests",
-  "passlib[bcrypt]==1.7.4",
+  "bcrypt>=4.0.0",
   "python-jose[cryptography]==3.3.0",
   "python-dotenv==1.0.1",
 ]
 
 [project.scripts]
 taskmanager = "app.scripts.run_app:main"
+taskmanager-frontend = "app.scripts.run_frontend:main"
 
 [dependency-groups]
 dev = [

@@ -4,7 +4,7 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
-from passlib.context import CryptContext
+import bcrypt
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
@@ -28,7 +28,6 @@ YA_AUTHORIZE_URL = "https://oauth.yandex.ru/authorize"
 YA_TOKEN_URL = "https://oauth.yandex.ru/token"
 YA_USERINFO_URL = "https://login.yandex.ru/info"
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 
 auth_router = APIRouter(prefix="/api/v1/auth", tags=["auth"]) 
@@ -51,11 +50,36 @@ class UserOut(BaseModel):
 
 
 def hash_password(password: str) -> str:
-    return pwd_context.hash(password)
+    """
+    Хэширует пароль используя bcrypt.
+    Bcrypt ограничивает пароль 72 байтами, поэтому обрезаем при необходимости.
+    """
+    password_bytes = password.encode('utf-8')
+    # Bcrypt ограничивает пароль 72 байтами
+    if len(password_bytes) > 72:
+        password_bytes = password_bytes[:72]
+    
+    # Генерируем соль и хэшируем пароль
+    salt = bcrypt.gensalt(rounds=12)
+    hashed = bcrypt.hashpw(password_bytes, salt)
+    # Возвращаем как строку для хранения в БД
+    return hashed.decode('utf-8')
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    return pwd_context.verify(plain_password, hashed_password)
+    """
+    Проверяет пароль против хэша.
+    """
+    try:
+        password_bytes = plain_password.encode('utf-8')
+        # Bcrypt ограничивает пароль 72 байтами
+        if len(password_bytes) > 72:
+            password_bytes = password_bytes[:72]
+        
+        hashed_bytes = hashed_password.encode('utf-8')
+        return bcrypt.checkpw(password_bytes, hashed_bytes)
+    except Exception:
+        return False
 
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
